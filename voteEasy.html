@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vote Easy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8">
+    <link rel='stylesheet' href='voteEasy.css' />
+    <script src='jquery-2.1.4.min.js'></script>
+    <script src='voteEasy.js'></script>
+    <script src='data.js'></script>
+</head>
+<body>
+
+<div id=voteEasy questionState='none'>
+    <div id=leftMenu>
+        <div id=title> <span class=firstLetter>V</span>ote<span class=firstLetter>E</span>asy <span class=trademark>TM</span> </div>
+        <div class=election>
+            <div class=electionName> Presidential Election </div>
+            <div class=electionImage><img src='images/usa.png'></div>
+        </div>
+        <div class=election>
+            <div class=electionName> Congressional Elections </div>
+            <div class=electionImage><img src='images/congress.png'></div>
+        </div>
+    </div>
+
+    <div id=topicButtons></div>
+    <select id=topicSelector>
+        <option class=topicOptionPlaceholder selected>Select topic</option>
+    </select>
+
+    <div id=welcomeMessage> To begin, select a topic above. </div>
+    <div id=question>
+        <div id=prevQuestion><div class=arrow></div></div>
+        <div id=questionContent>
+            <div id=questionTopic></div>
+            <a id=questionDetails href='' target=_blank> details </a>
+            <div class=clear></div>
+            <div id=questionText></div>
+        </div>
+        <div id=answer>
+            <div id=answerScale>
+                <div id=answerTrue></div>
+                <div class=scaleBox id=scaleBox4 level=4></div>
+                <div class=scaleBox id=scaleBox3 level=3></div>
+                <div class=scaleBox id=scaleBox2 level=2></div>
+                <div class=scaleBox id=scaleBox1 level=1></div>
+                <div class=scaleBox id=scaleBox0 level=0></div>
+                <div id=answerFalse></div>
+            </div>
+            <div id=closeQuestion> X </div>
+        </div>
+        <div id=nextQuestion><div class=arrow></div></div>
+    </div>
+
+    <div id=signs></div>
+
+</div>
+
+</body>
+</html>
