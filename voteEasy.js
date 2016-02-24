@@ -31,6 +31,7 @@ var questionIndex = 1;
 jQuery(document).ready( function(){
 
 // retrieve data via AJAX
+// jQuery.get( {  } );
 
     // initialize DOM elements
     initializeQuestions();
