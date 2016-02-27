@@ -58,7 +58,7 @@ handleAnswerScaleClick( event ){
     setQuestion( question );
     setTimeout( function(){ handleIncrementQuestion(1); } , 500 );
     // update signs display
-    updateSigns();
+    updateScores();
 }
 
     function
@@ -132,7 +132,7 @@ initializeSigns() {
         var image = candidate.image;
         var party = candidate.party
         var score = candidate.score ?  candidate.score  :  0;
-        var sign = createElement('div', null, 'signCell', 
+        var sign = createElement('div', 'signCell'+candidate.index, 'signCell', 
             '<div class="sign" id="sign'+candidate.index+'">' + 
                 '<div class="candidateName">'+candidateName+'</div>' + 
                 '<div class="candidateScore" id="score'+candidate.index+'">' + score + '% match</div>' + 
@@ -185,16 +185,13 @@ setQuestion( questionData ){
 }
 
     function 
-updateSigns() {
-    // update scores:  score = sum( levels-diff )  ?
-    // want to normalize scores to 0-100%.  
-    // want to ignore topics where user did not answer?  
-    // want to consider topics candidate did not answer?
-//     var scoreLimit = questionSeries.length * LEVELS;
-// console.log( '\n scoreLimit=', scoreLimit );
+updateScores() {
+    // score = sum( levels-diff )
+    //     normalize scores to 0-100%.  
+    //     ignore topics that user did not answer
+    //     consider topics that candidate did not answer
     // for each candidate...
     for ( var c in candidates ){  
-console.log( 'c=', c );
         var candidate = candidates[c];
         // reset scores
         var scoreSum = 0;
@@ -215,51 +212,115 @@ console.log( 'c=', c );
 
                 // increment match score
                 var diff = Math.abs(candidateLevel - question.myAnswer);
-console.log( '\t question.topic=', question.topic, 
- '\t question.myAnswer=', question.myAnswer,
- '\t candidateAnswer=', candidateAnswer, 
- '\t candidateLevel=', candidateLevel, 
- '\t diff=', diff 
-);
                 scoreSum += LEVELS - 1 - diff;
             }
         }
-    candidate.score = (scoreLimit == 0)?  0  :  Math.floor(100*(scoreSum / scoreLimit));
-console.log( '\t score=', candidate.score );
+        candidate.score = (scoreLimit == 0)?  0  :  Math.floor(100*(scoreSum / scoreLimit));
     }
+    updateSigns();
+}
     
+    function 
+updateSigns() {
     // rank candidates by score
     var candidatesOrdered = [];
     for ( var c in candidates ){  candidatesOrdered.push( candidates[c] );  }
     candidatesOrdered.sort( function(a,b){ return (b.score - a.score); } );
-console.log( 'candidatesOrdered=', candidatesOrdered );
     for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
         candidatesOrdered[c].rank = candidatesOrdered.length - c;
     }
+// console.log( 'candidatesOrdered=', candidatesOrdered );
     
     // update display
+    jQuery('#signs')[0].setAttribute('scored', 'true');
     // for each candidate...
     for ( var c in candidates ){  
         var candidate = candidates[c];
         jQuery('#score'+candidate.index)[0].innerHTML = candidate.score + '% match';
-        // group signs into equal-scored non-overlapping levels?
-        // measure width needed for all signs, especially in widest level
-        // set sizes & positions of signs
-        var sign = jQuery('#sign'+candidate.index)[0];
-        var scale = ( (candidate.score/1.5) + 50 )/ 100;
-        sign.style.transform = 'scale('+scale+','+scale+')';
-        sign.style.zIndex = candidate.rank;
-        sign.style.top = candidate.score + 'px';
+// Group signs into equal-scored non-overlapping levels?
+// Measure width needed for all signs, especially in widest level?
+        // Set sizes & positions of signs
+//         var sign = jQuery('#sign'+candidate.index)[0];
+//         var scale = ( (candidate.score/1.5) + 50 )/ 100;
+//         var translate =  - ((1/scale) * 100);
+//         sign.style.transform = 'scale('+scale+','+scale+') translate('+translate+'%,'+translate+'%)';
+
+// // var sign = jQuery('#signCell'+candidate.index)[0];
+// var sign = jQuery('#sign'+candidate.index)[0];
+// var scale = (candidate.score/200) + 0.50;
+// sign.style.transform = 'scale('+scale+','+scale+')';
+//         sign.style.zIndex = candidate.rank;
+//         sign.style.top = ((candidate.score*2) - 50) + 'px';
     }
+
+// use absolute positioning
+// find size reduction to fit at least 3 signs on biggest row
+var screenWidth = jQuery(window).width();
+console.log( 'screenWidth=', screenWidth );
+var sumLargestRowWidth = 0;
+for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
+    var candidate = candidatesOrdered[c];
+    candidate.originalWidth = jQuery('#signCell'+candidate.index).width();
+console.log( 'candidate=', candidate, '  originalWidth=', candidate.originalWidth );
+    candidate.scale = (candidate.score/200) + 0.50;  // compute sign size based on score alone
+    if ( c < 3 ){  sumLargestRowWidth += candidate.scale * candidate.originalWidth;  }
+}
+var scaleMultiple = Math.min( (screenWidth-10)/sumLargestRowWidth, 1.00 );
+console.log( 'scaleMultiple=', scaleMultiple );
+// Group signs into rows, fitting at least 3 signs per row.
+var signY = 0;
+var signX = 0;
+var rows = [ [] ];  // series[ series[candidate] ]
+for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
+    var candidate = candidatesOrdered[c];
+    candidate.scale *= scaleMultiple;
+    candidate.scaledWidth = candidate.scale * candidate.originalWidth;
+console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
+    if ( signX + candidate.scaledWidth > screenWidth ){
+        // place this sign on next row
+        signX = 0;
+        rows.push( [] );
+        signY -= 50 * candidate.scale;
+    }
+    candidate.x = signX;
+    candidate.y = signY;
+    signX += candidate.scaledWidth;
+    rows[ rows.length-1 ].push( candidate );
+}
+// center rows, align last row top
+for ( var r = 0;  r < rows.length;  ++r ){
+    var sumRowWidth = rows[r].reduce( function(s,c){ return s + c.scaledWidth; } , 0 );
+console.log( 'sumRowWidth=', sumRowWidth );
+    var shiftX = (screenWidth - sumRowWidth)/2;
+    for ( var c = 0;  c < rows[r].length;  ++c ){
+        rows[r][c].x += shiftX;
+        rows[r][c].y -= signY;
+    }
+}
+// apply size & position to sign divs
+for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
+    var candidate = candidatesOrdered[c];
+    var sign = jQuery('#signCell'+candidate.index)[0];
+    // when resizing with transform, align to top left corner
+    // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
+    var scale = candidate.scale;
+    var translate = -100 * ((0.5/scale) - 0.5);
+    sign.style.transform = 'scale('+scale+','+scale+') translate('+translate+'%,'+translate+'%)';
+    sign.style.zIndex = candidate.rank;
+    sign.style.left = candidate.x + 'px';
+    sign.style.top = candidate.y + 'px';
+}
+
+
 }
 
 
     function
 createElement( tag, id, className, innerHTML ){
     var element = document.createElement(tag);
-    element.id = id;
-    element.className = className;
-    element.innerHTML = innerHTML;
+    if ( id !== null ){  element.id = id;  }
+    if ( className !== null ){  element.className = className;  }
+    if ( innerHTML !== null ){  element.innerHTML = innerHTML;  }
     return element;
 }
 
