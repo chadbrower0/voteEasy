@@ -9,16 +9,41 @@ var questionIndex = 1;
 // data
 var questions = null;
 var candidates = null;
-var questionSeries = [ ];  // series[questionData]
+var questionSeries = [ ];  // series[questionData] , references questions
 
 // on load...
 jQuery(document).ready( function(){
-
     questions = vs.questions;
     candidates = vs.candidates;
-    // retrieve data via AJAX, instead of inline script data
-    // jQuery.get( {  } );
+    initialize();
+    // retrieve data via AJAX, instead of inline script variables
+    // retrieveData();
+} );
 
+function
+retrieveData( ){
+    var url = 'election.json';
+    var sendData = { region:'usa', office:'president' };
+    jQuery.ajax( {
+        accepts: 'application/json' ,
+        async: true ,
+        cache: false ,
+        data: sendData ,
+        dataType: 'json' ,
+        error: function(request, status, error){ console.log('error=', error); } ,
+        method: 'GET' ,
+        success: function(responseData, status, request){
+            if ( ! responseData ){ return; }
+            questions = responseData.questions;
+            candidates = responseData.candidates;
+            initialize();
+        } ,
+        url: url
+    } );
+}
+
+function
+initialize( ){
     // initialize DOM elements
     initializeQuestions();
     initializeTopics();
@@ -33,9 +58,7 @@ jQuery(document).ready( function(){
     jQuery('#contentCover').on('click', handleMenuButtonClick);
     jQuery(window).on('resize', updateScores);
     jQuery('.candidateImage').on('load', updateScores);  // set initial sign layout
-} );
-
-
+}
 
 function
 initializeQuestions( ){
@@ -68,10 +91,9 @@ handleAnswerScaleClick( event ){
     var level = event.target.getAttribute('level');
     level = parseInt(level);
     questionSeries[ questionIndex ].myAnswer = level;
-    // update answer display, and advance to next question
+    // update answer display
     var question = questionSeries[ questionIndex ];
     setQuestion( question );
-//     setTimeout( function(){ handleIncrementQuestion(1); } , 500 );
     // update signs display
     updateScores();
 }
@@ -214,7 +236,7 @@ createElement( tag, id, className, innerHTML ){
 function
 updateScores() {
     // score = sum( levels-diff )
-    //     normalize scores to 0-100%.  
+    //     normalize scores to 0-100%
     //     ignore topics that user did not answer
     //     consider topics that candidate did not answer
     // for each candidate...
@@ -248,7 +270,7 @@ updateScores() {
     jQuery('#signs')[0].setAttribute('scored', 'true');
     updateSigns();
 }
-    
+
 function
 updateSigns() {
     // update score text
@@ -258,30 +280,15 @@ updateSigns() {
     }
     // resize and move signs
     var screenWidth = jQuery(window).width();
-// console.log( 'screenWidth=', screenWidth );
     if ( screenWidth < MAX_NARROW_SCREEN ){  updateSignPositionsNarrow();  }
     else {  updateSignPositionsWide();  }
 }
 
 function
-orderCandidates( ){
-    // rank candidates by score, and set rank field in each candidate
-    var candidatesOrdered = [];
-    for ( var c in candidates ){  candidatesOrdered.push( candidates[c] );  }
-    candidatesOrdered.sort( function(a,b){ return (b.score - a.score); } );
-    for ( c = 0;  c < candidatesOrdered.length;  ++c ){
-        candidatesOrdered[c].rank = candidatesOrdered.length - c;
-    }
-    return candidatesOrdered;
-}
-
-function
 updateSignPositionsWide( ){
-// console.log( 'updateSignPositionsWide()' );
+    // computes absolute positioning & location
+
     orderCandidates();  // set candidate.rank
-
-    // use absolute positioning
-
     // find size reduction to fit all signs on 1 row
     var screenWidth = jQuery(window).width();
     var sumRowWidth = 0;
@@ -294,62 +301,51 @@ updateSignPositionsWide( ){
         sumSpaceWidth += 10;
     }
     var scaleMultiple = Math.min( (screenWidth-sumSpaceWidth)/sumRowWidth, 1.00 );
-// console.log( 'sumRowWidth=', sumRowWidth, ' scaleMultiple=', scaleMultiple );
     // position signs in 1 row
     var signX = 0;
     for ( c in candidates ){
         candidate = candidates[c];
         candidate.scale *= scaleMultiple;
         candidate.scaledWidth = candidate.scale * candidate.originalWidth;
-// console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
         candidate.x = signX;
         candidate.y = 0;
         signX += candidate.scaledWidth + 10;
     }
     // center row (in case row is too narrow)
     var shiftX = (screenWidth - signX)/2;
-// console.log( 'sumRowWidth=', sumRowWidth, ' shiftX=', shiftX );
     for ( c in candidates ){
         candidates[c].x += shiftX;
     }
     // apply size & position to sign divs
     for ( c in candidates ){
         candidate = candidates[c];
-        var signCell = jQuery('#signCell'+candidate.index)[0];
         // when resizing with transform, align to top left corner
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
+        var signCell = jQuery('#signCell'+candidate.index)[0];
         signCell.style.transform = 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,0%)';
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
         signCell.style.top = candidate.y + 'px';
-
-        var sign = jQuery('#sign'+candidate.index)[0];
-        sign.style.transform = null;
-        sign.style.zIndex = null;
-        sign.style.left = null;
-        sign.style.top = null;
     }
 }
 
 function
 updateSignPositionsNarrow( ){
-    var candidatesOrdered = orderCandidates();
+    // computes absolute positioning & location
 
-    // use absolute positioning
+    var candidatesOrdered = orderCandidates();
     // find size reduction to fit at least 3 signs on biggest row
     var screenWidth = jQuery(window).width();
     var sumLargestRowWidth = 0;
     for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
         var candidate = candidatesOrdered[c];
         candidate.originalWidth = jQuery('#signCell'+candidate.index).width();
-// console.log( 'candidate=', candidate, '  originalWidth=', candidate.originalWidth );
         candidate.scale = (candidate.score/200) + 0.50;  // compute sign size based on score alone
         if ( c < 3 ){  sumLargestRowWidth += candidate.scale * candidate.originalWidth;  }
     }
     var scaleMultiple = Math.min( (screenWidth-10)/sumLargestRowWidth, 1.00 );
-// console.log( 'scaleMultiple=', scaleMultiple );
-    // Group signs into rows, fitting at least 3 signs per row.
+    // group signs into rows
     var signY = 0;
     var signX = 0;
     var rows = [ [] ];  // series[ series[candidate] ]
@@ -357,7 +353,6 @@ updateSignPositionsNarrow( ){
         candidate = candidatesOrdered[c];
         candidate.scale *= scaleMultiple;
         candidate.scaledWidth = candidate.scale * candidate.originalWidth;
-// console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
         if ( signX + candidate.scaledWidth > screenWidth ){
             // place this sign on next row
             signX = 0;
@@ -372,7 +367,6 @@ updateSignPositionsNarrow( ){
     // center rows, align last row top
     for ( var r = 0;  r < rows.length;  ++r ){
         var sumRowWidth = rows[r].reduce( function(s,c){ return s + c.scaledWidth; } , 0 );
-// console.log( 'sumRowWidth=', sumRowWidth );
         var shiftX = (screenWidth - sumRowWidth)/2;
         for ( c = 0;  c < rows[r].length;  ++c ){
             rows[r][c].x += shiftX;
@@ -382,20 +376,26 @@ updateSignPositionsNarrow( ){
     // apply size & position to sign divs
     for ( c = 0;  c < candidatesOrdered.length;  ++c ){
         candidate = candidatesOrdered[c];
-        var signCell = jQuery('#signCell'+candidate.index)[0];
         // when resizing with transform, align to top left corner
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
+        var signCell = jQuery('#signCell'+candidate.index)[0];
         signCell.style.transform = 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%)';
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
         signCell.style.top = candidate.y + 'px';
-
-        var sign = jQuery('#sign'+candidate.index)[0];
-        sign.style.transform = null;
-        sign.style.zIndex = null;
-        sign.style.left = null;
-        sign.style.top = null;
     }
+}
+
+function
+orderCandidates( ){
+    // rank candidates by score, and set rank field in each candidate
+    var candidatesOrdered = [];
+    for ( var c in candidates ){  candidatesOrdered.push( candidates[c] );  }
+    candidatesOrdered.sort( function(a,b){ return (b.score - a.score); } );
+    for ( c = 0;  c < candidatesOrdered.length;  ++c ){
+        candidatesOrdered[c].rank = candidatesOrdered.length - c;
+    }
+    return candidatesOrdered;
 }
 

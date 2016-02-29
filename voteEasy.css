@@ -81,23 +81,6 @@ body {  margin:0px;  padding:0px;  }
     #topicSelector {  display:none;  }
     #welcomeMessage {  float:left;  margin:100px 0px 100px 150px;  }
     #question {  margin:150px 10px 10px 200px;  }
-
-/*     #signs {  width:100%;  transform:none;  }
-/*         .signCell {  }
-/*             .sign {  }
-/*     #signs[scored='true'] {  height:auto;  }
-/*         #signs[scored='true'] .signCell {  display:inline-block;  position:relative;  border:solid 1px red;  }
-/*             #signs[scored='true'] .sign {  }
-*/
-
-/*     #signs {  height:300px;  width:100%;  transform:none;  display:table;  }
-/*         .signCell {  height:20px;  display:table-cell;  }
-/*             .sign {  position:absolute;  top:0px;  left:0px;  }
-/*     #signs[scored='true'] {  }
-/*         #signs[scored='true'] .signCell {  display:table-cell;  position:relative;  }
-/*             #signs[scored='true'] .sign {  }
-*/
-
 }
 
 
