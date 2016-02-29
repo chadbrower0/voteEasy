@@ -1,4 +1,5 @@
-var questions = {
+
+vs.questions = {
     'abortion': [{text:'Do you generally support pro-choice or pro-life legislation?', yes:'pro-life', no:'pro-choice'}] ,
     'budget': [{text:'In order to balance the budget, do you support an income tax increase on any tax bracket?'}] ,
     'crime': [{text:'Do you support mandatory minimum sentences for non-violent drug offenders?'}] ,
@@ -20,7 +21,7 @@ var questions = {
     'social security': [{text:'Do you support allowing individuals to divert a portion of their Social Security taxes into personal retirement accounts?'}]
 };
 
-var candidates = {
+vs.candidates = {
     'Jeb Bush': {
         'party': 'Republican' ,
         'image': 'images/faceBush.png' ,

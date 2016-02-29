@@ -7,29 +7,17 @@ var MAX_NARROW_SCREEN = 825;
 var questionIndex = 1;
 
 // data
+var questions = null;
+var candidates = null;
 var questionSeries = [ ];  // series[questionData]
-
-    function
-initializeQuestions( ){
-    for ( var t in questions ){
-        for ( var q = 0;  q < questions[t].length;  ++q ){
-            var question = questions[t][q];
-            // add computed fields
-            question.topic = t;
-            if ( ! question.yes ){  question.yes = 'yes';  }
-            if ( ! question.no ){  question.no = 'no';  }
-            // collect
-            questionSeries.push( question );
-        }
-    }
-}
-
 
 // on load...
 jQuery(document).ready( function(){
 
-// retrieve data via AJAX
-// jQuery.get( {  } );
+    questions = vs.questions;
+    candidates = vs.candidates;
+    // retrieve data via AJAX, instead of inline script data
+    // jQuery.get( {  } );
 
     // initialize DOM elements
     initializeQuestions();
@@ -48,16 +36,34 @@ jQuery(document).ready( function(){
 } );
 
 
+
+function
+initializeQuestions( ){
+    for ( var t in questions ){
+        for ( var q = 0;  q < questions[t].length;  ++q ){
+            var question = questions[t][q];
+            // add computed fields
+            question.topic = t;
+            if ( ! question.yes ){  question.yes = 'yes';  }
+            if ( ! question.no ){  question.no = 'no';  }
+            // collect
+            questionSeries.push( question );
+        }
+    }
+}
+
+
+
 // user input handlers //////////////////////////////////////////////////////////////////////
 
-    function
-handleMenuButtonClick( event ){
+function
+handleMenuButtonClick( ){
     var voteEasy = jQuery('#voteEasy')[0];
     var menuActive = ( voteEasy.getAttribute('menuActive') == 'true' )?  'false'  :  'true';
     voteEasy.setAttribute('menuActive', menuActive);
 }
 
-    function
+function
 handleAnswerScaleClick( event ){
     var level = event.target.getAttribute('level');
     level = parseInt(level);
@@ -70,20 +76,20 @@ handleAnswerScaleClick( event ){
     updateScores();
 }
 
-    function
+function
 handleTopicClick( event ){ 
     var topic = event.target.getAttribute('topic');
     setQuestionForTopic( topic );
 }
 
-    function
-handleTopicSelect( event ){ 
+function
+handleTopicSelect( ){
     var topicSelector = jQuery('#topicSelector')[0];
     var topic = topicSelector.value;
     setQuestionForTopic( topic );
 }
 
-    function
+function
 setQuestionForTopic( topic ){
     var questionsForTopic = questions[topic];
     var question = questionsForTopic ?  questionsForTopic[0]  :  null;
@@ -91,7 +97,7 @@ setQuestionForTopic( topic ){
     setQuestion( question );
 }
 
-    function
+function
 handleNextQuestion( event ){
     if ( event.target.parentElement.id == 'nextQuestion' ){
         handleIncrementQuestion( 1 );
@@ -101,7 +107,7 @@ handleNextQuestion( event ){
     }
 }
 
-    function
+function
 handleIncrementQuestion( increment ){
     questionIndex = ( questionIndex + increment ) % questionSeries.length;  // wrap after end
     while ( questionIndex < 0 ){  questionIndex += questionSeries.length;  }  // wrap before start
@@ -110,9 +116,10 @@ handleIncrementQuestion( increment ){
 }
 
 
+
 // initialize DOM //////////////////////////////////////////////////////////////////////
 
-    function 
+function
 initializeTopics() {
     // buttons
     var topicButtons = jQuery('#topicButtons')[0];
@@ -122,7 +129,7 @@ initializeTopics() {
     }
     // select pull-down
     var topicSelector = jQuery('#topicSelector')[0];
-    for ( var topic in questions ){
+    for ( topic in questions ){
         var option = createElement('option', null, 'topicOption', null);
         option.value = topic;
         option.text = topic;
@@ -130,15 +137,15 @@ initializeTopics() {
     }
 }
 
-    function 
+function
 initializeSigns() {
     var signs = jQuery('#signs')[0];
     var index = 0;
     for ( var candidateName in candidates ){
-        candidate = candidates[candidateName];
+        var candidate = candidates[candidateName];
         candidate.index = index++;
         var image = candidate.image;
-        var party = candidate.party
+        var party = candidate.party;
         var score = candidate.score ?  candidate.score  :  0;
         var sign = createElement('div', 'signCell'+candidate.index, 'signCell', 
             '<div class="sign" id="sign'+candidate.index+'">' + 
@@ -152,13 +159,12 @@ initializeSigns() {
     }
 }
 
-    function 
+function
 setQuestion( questionData ){
     var voteEasyDiv = jQuery('#voteEasy')[0];
     if ( questionData == null ){  voteEasyDiv.setAttribute('questionState', 'none');  return;  }
 
     // find divs
-    var questionDiv = jQuery('#question')[0];
     var questionTopicDiv = jQuery('#questionTopic')[0];
     var questionTextDiv = jQuery('#questionText')[0];
     var answerTrue = jQuery('#answerTrue')[0];
@@ -192,7 +198,7 @@ setQuestion( questionData ){
     voteEasyDiv.setAttribute('questionState', 'show');
 }
 
-    function
+function
 createElement( tag, id, className, innerHTML ){
     var element = document.createElement(tag);
     if ( id !== null ){  element.id = id;  }
@@ -202,9 +208,10 @@ createElement( tag, id, className, innerHTML ){
 }
 
 
+
 // update candidate matches //////////////////////////////////////////////////////////////////////
 
-    function 
+function
 updateScores() {
     // score = sum( levels-diff )
     //     normalize scores to 0-100%.  
@@ -242,7 +249,7 @@ updateScores() {
     updateSigns();
 }
     
-    function 
+function
 updateSigns() {
     // update score text
     for ( var c in candidates ){  
@@ -251,27 +258,27 @@ updateSigns() {
     }
     // resize and move signs
     var screenWidth = jQuery(window).width();
-console.log( 'screenWidth=', screenWidth );
+// console.log( 'screenWidth=', screenWidth );
     if ( screenWidth < MAX_NARROW_SCREEN ){  updateSignPositionsNarrow();  }
     else {  updateSignPositionsWide();  }
 }
 
-    function
+function
 orderCandidates( ){
     // rank candidates by score, and set rank field in each candidate
     var candidatesOrdered = [];
     for ( var c in candidates ){  candidatesOrdered.push( candidates[c] );  }
     candidatesOrdered.sort( function(a,b){ return (b.score - a.score); } );
-    for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
+    for ( c = 0;  c < candidatesOrdered.length;  ++c ){
         candidatesOrdered[c].rank = candidatesOrdered.length - c;
     }
     return candidatesOrdered;
 }
 
-    function
+function
 updateSignPositionsWide( ){
-console.log( 'updateSignPositionsWide()' );
-    candidatesOrdered = orderCandidates();  // set candidate.rank
+// console.log( 'updateSignPositionsWide()' );
+    orderCandidates();  // set candidate.rank
 
     // use absolute positioning
 
@@ -287,27 +294,27 @@ console.log( 'updateSignPositionsWide()' );
         sumSpaceWidth += 10;
     }
     var scaleMultiple = Math.min( (screenWidth-sumSpaceWidth)/sumRowWidth, 1.00 );
-console.log( 'sumRowWidth=', sumRowWidth, ' scaleMultiple=', scaleMultiple );
+// console.log( 'sumRowWidth=', sumRowWidth, ' scaleMultiple=', scaleMultiple );
     // position signs in 1 row
     var signX = 0;
-    for ( var c in candidates ){
-        var candidate = candidates[c];
+    for ( c in candidates ){
+        candidate = candidates[c];
         candidate.scale *= scaleMultiple;
         candidate.scaledWidth = candidate.scale * candidate.originalWidth;
-console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
+// console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
         candidate.x = signX;
         candidate.y = 0;
         signX += candidate.scaledWidth + 10;
     }
     // center row (in case row is too narrow)
     var shiftX = (screenWidth - signX)/2;
-console.log( 'sumRowWidth=', sumRowWidth, ' shiftX=', shiftX );
-    for ( var c in candidates ){
+// console.log( 'sumRowWidth=', sumRowWidth, ' shiftX=', shiftX );
+    for ( c in candidates ){
         candidates[c].x += shiftX;
     }
     // apply size & position to sign divs
-    for ( var c in candidates ){
-        var candidate = candidates[c];
+    for ( c in candidates ){
+        candidate = candidates[c];
         var signCell = jQuery('#signCell'+candidate.index)[0];
         // when resizing with transform, align to top left corner
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
@@ -325,9 +332,9 @@ console.log( 'sumRowWidth=', sumRowWidth, ' shiftX=', shiftX );
     }
 }
 
-    function
+function
 updateSignPositionsNarrow( ){
-    candidatesOrdered = orderCandidates();
+    var candidatesOrdered = orderCandidates();
 
     // use absolute positioning
     // find size reduction to fit at least 3 signs on biggest row
@@ -336,21 +343,21 @@ updateSignPositionsNarrow( ){
     for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
         var candidate = candidatesOrdered[c];
         candidate.originalWidth = jQuery('#signCell'+candidate.index).width();
-console.log( 'candidate=', candidate, '  originalWidth=', candidate.originalWidth );
+// console.log( 'candidate=', candidate, '  originalWidth=', candidate.originalWidth );
         candidate.scale = (candidate.score/200) + 0.50;  // compute sign size based on score alone
         if ( c < 3 ){  sumLargestRowWidth += candidate.scale * candidate.originalWidth;  }
     }
     var scaleMultiple = Math.min( (screenWidth-10)/sumLargestRowWidth, 1.00 );
-console.log( 'scaleMultiple=', scaleMultiple );
+// console.log( 'scaleMultiple=', scaleMultiple );
     // Group signs into rows, fitting at least 3 signs per row.
     var signY = 0;
     var signX = 0;
     var rows = [ [] ];  // series[ series[candidate] ]
-    for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
-        var candidate = candidatesOrdered[c];
+    for ( c = 0;  c < candidatesOrdered.length;  ++c ){
+        candidate = candidatesOrdered[c];
         candidate.scale *= scaleMultiple;
         candidate.scaledWidth = candidate.scale * candidate.originalWidth;
-console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
+// console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth );
         if ( signX + candidate.scaledWidth > screenWidth ){
             // place this sign on next row
             signX = 0;
@@ -365,16 +372,16 @@ console.log( 'scale=', candidate.scale, ' scaledWidth=', candidate.scaledWidth )
     // center rows, align last row top
     for ( var r = 0;  r < rows.length;  ++r ){
         var sumRowWidth = rows[r].reduce( function(s,c){ return s + c.scaledWidth; } , 0 );
-console.log( 'sumRowWidth=', sumRowWidth );
+// console.log( 'sumRowWidth=', sumRowWidth );
         var shiftX = (screenWidth - sumRowWidth)/2;
-        for ( var c = 0;  c < rows[r].length;  ++c ){
+        for ( c = 0;  c < rows[r].length;  ++c ){
             rows[r][c].x += shiftX;
             rows[r][c].y -= signY;
         }
     }
     // apply size & position to sign divs
-    for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
-        var candidate = candidatesOrdered[c];
+    for ( c = 0;  c < candidatesOrdered.length;  ++c ){
+        candidate = candidatesOrdered[c];
         var signCell = jQuery('#signCell'+candidate.index)[0];
         // when resizing with transform, align to top left corner
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
