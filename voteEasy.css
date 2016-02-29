@@ -68,6 +68,7 @@ body {  margin:0px;  padding:0px;  }
                 .candidateScore {  color:#888888;  }
                 .candidateImage {  }
                 .candidateParty {  color:#aaaaaa;  }
+            .signPost {  margin:0px auto;  width:10px;  height:40px;  background-color:#B5795A;  box-shadow:-1px 3px 2px #444444 inset;  }
 
     #signs[scored='true'] {  margin-top:30px;  width:100%;  transform:none;  height:300px;  }
         #signs[scored='true'] .signCell {  display:block;  position:absolute;  }

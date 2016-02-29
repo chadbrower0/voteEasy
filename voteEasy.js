@@ -146,7 +146,8 @@ initializeTopics() {
     // buttons
     var topicButtons = jQuery('#topicButtons')[0];
     for ( var topic in questions ){
-        var button = createElement('div', null, 'topicButtonCell', '<div class=topicButton topic="'+topic+'"><span class=firstLetter>'+topic[0]+'</span>'+topic.slice(1)+'</div>' );
+        var button = createElement('div', null, 'topicButtonCell',
+            '<div class=topicButton topic="'+topic+'"><span class=firstLetter>'+topic[0]+'</span>'+topic.slice(1)+'</div>' );
         topicButtons.appendChild( button );
     }
     // select pull-down
@@ -175,7 +176,8 @@ initializeSigns() {
                 '<div class="candidateScore" id="score'+candidate.index+'">' + score + '% match</div>' + 
                 '<img class="candidateImage" src="'+image+'"/>' + 
                 '<div class="candidateParty">'+party+'</div>' + 
-            '</div>'
+            '</div>' +
+            '<div class="signPost"></div>'
         );
         signs.appendChild( sign );
     }
