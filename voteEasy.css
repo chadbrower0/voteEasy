@@ -23,8 +23,8 @@ body {  margin:0px;  padding:0px;  }
                 background-color:white;  border-radius:5px;  padding:7px;  box-shadow: 2px 2px 5px grey;  cursor:pointer;
             }
 
-    #topicSelectorDiv {  text-align:center;  padding:0px;  margin:-5px 0px 0px 0px;  }
-        #topicSelector {  padding:15px 20px 20px 20px;  font-size:200%;  text-transform:capitalize;  }
+    #topicSelectorDiv {  text-align:center;  padding:10px;  margin:-5px 0px 0px 0px;  }
+        #topicSelector {  padding:10px;  font-size:200%;  text-transform:capitalize;  }
             .topicOption {  text-transform:capitalize;  }
             .topicOptionPlaceholder {  text-transform:uppercase;  color:grey;  }
 

@@ -1,5 +1,12 @@
 
-// collect question series
+// constants
+var LEVELS = 5;
+var MAX_NARROW_SCREEN = 825;
+
+// state
+var questionIndex = 1;
+
+// data
 var questionSeries = [ ];  // series[questionData]
 
     function
@@ -18,16 +25,6 @@ initializeQuestions( ){
 }
 
 
-// constants
-var LEVELS = 5;
-var MAX_NARROW_SCREEN = 825;
-
-// state
-var questionIndex = 1;
-// var userAnswers = [ ];
-
-
-
 // on load...
 jQuery(document).ready( function(){
 
@@ -38,8 +35,6 @@ jQuery(document).ready( function(){
     initializeQuestions();
     initializeTopics();
     initializeSigns();
-    var screenWidth = jQuery(window).width();
-    if ( screenWidth > MAX_NARROW_SCREEN ){  updateScores();  }
     // set handlers
     jQuery('.arrow').on('click', handleNextQuestion);
     jQuery('.topicButton').on('click', handleTopicClick);
@@ -49,6 +44,7 @@ jQuery(document).ready( function(){
     jQuery('#menuButton').on('click', handleMenuButtonClick);
     jQuery('#contentCover').on('click', handleMenuButtonClick);
     jQuery(window).on('resize', updateScores);
+    jQuery('.candidateImage').on('load', updateScores);  // set initial sign layout
 } );
 
 
@@ -69,7 +65,7 @@ handleAnswerScaleClick( event ){
     // update answer display, and advance to next question
     var question = questionSeries[ questionIndex ];
     setQuestion( question );
-    setTimeout( function(){ handleIncrementQuestion(1); } , 500 );
+//     setTimeout( function(){ handleIncrementQuestion(1); } , 500 );
     // update signs display
     updateScores();
 }
@@ -94,7 +90,6 @@ setQuestionForTopic( topic ){
     questionIndex = questionSeries.indexOf( question );
     setQuestion( question );
 }
-
 
     function
 handleNextQuestion( event ){
@@ -197,6 +192,18 @@ setQuestion( questionData ){
     voteEasyDiv.setAttribute('questionState', 'show');
 }
 
+    function
+createElement( tag, id, className, innerHTML ){
+    var element = document.createElement(tag);
+    if ( id !== null ){  element.id = id;  }
+    if ( className !== null ){  element.className = className;  }
+    if ( innerHTML !== null ){  element.innerHTML = innerHTML;  }
+    return element;
+}
+
+
+// update candidate matches //////////////////////////////////////////////////////////////////////
+
     function 
 updateScores() {
     // score = sum( levels-diff )
@@ -230,19 +237,18 @@ updateScores() {
         }
         candidate.score = (scoreLimit == 0)?  0  :  Math.floor(100*(scoreSum / scoreLimit));
     }
+    // update display
+    jQuery('#signs')[0].setAttribute('scored', 'true');
     updateSigns();
 }
     
     function 
 updateSigns() {
-    jQuery('#signs')[0].setAttribute('scored', 'true');
-
     // update score text
     for ( var c in candidates ){  
         var candidate = candidates[c];
         jQuery('#score'+candidate.index)[0].innerHTML = candidate.score + '% match';
     }
-
     // resize and move signs
     var screenWidth = jQuery(window).width();
 console.log( 'screenWidth=', screenWidth );
@@ -259,7 +265,6 @@ orderCandidates( ){
     for ( var c = 0;  c < candidatesOrdered.length;  ++c ){
         candidatesOrdered[c].rank = candidatesOrdered.length - c;
     }
-// console.log( 'candidatesOrdered=', candidatesOrdered );
     return candidatesOrdered;
 }
 
@@ -319,30 +324,6 @@ console.log( 'sumRowWidth=', sumRowWidth, ' shiftX=', shiftX );
         sign.style.top = null;
     }
 }
-
-//     function
-// updateSignPositionsWide_fixedSpace( ){
-// console.log( 'updateSignPositionsWide()' );
-//     orderCandidates();  // set candidate.rank
-//     for ( var c in candidates ){
-//         var candidate = candidates[c];
-//         candidate.scale = (candidate.score/200) + 0.50;
-//         candidate.x = 0;
-//         candidate.y = candidate.score;
-// 
-//         var signCell = jQuery('#signCell'+candidate.index)[0];
-//         signCell.style.transform = null;
-//         signCell.style.zIndex = null;
-//         signCell.style.left = null;
-//         signCell.style.top = null;
-// 
-//         var sign = jQuery('#sign'+candidate.index)[0];
-//         sign.style.transform = 'scale('+candidate.scale+','+candidate.scale+')';
-//         sign.style.zIndex = candidate.rank;
-//         sign.style.left = candidate.x + 'px';
-//         sign.style.top = candidate.y + 'px';
-//     }
-// }
 
     function
 updateSignPositionsNarrow( ){
@@ -409,15 +390,5 @@ console.log( 'sumRowWidth=', sumRowWidth );
         sign.style.left = null;
         sign.style.top = null;
     }
-}
-
-
-    function
-createElement( tag, id, className, innerHTML ){
-    var element = document.createElement(tag);
-    if ( id !== null ){  element.id = id;  }
-    if ( className !== null ){  element.className = className;  }
-    if ( innerHTML !== null ){  element.innerHTML = innerHTML;  }
-    return element;
 }
 
