@@ -62,8 +62,8 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
         #nextQuestion {  display:table-cell;  }
             #nextQuestion .arrow {  transform:rotate(180deg);  margin-right:-5px;  }
 
-    #signs {  position:relative;  margin:50px 0px 0px 0px;  width:150%;  transform:scale(0.66) translate(-25%,-25%);  text-align:center;  }
-        .signCell {  display:inline-block;  position:relative;  padding:0px;  margin:2px;  }
+    #signs {  position:relative;  margin:30px 0px 0px 0px;  text-align:center;  height:300px;  }
+        .signCell {  display:block;  position:absolute;  padding:0px;  margin:2px;  }
             .sign {  
                 position:relative;  background-color:white;  display:inline-block;  border-radius:5px;  border:solid 1px #cccccc;  
                 padding:10px;  text-align:center;  text-decoration:none;
@@ -75,9 +75,10 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
                 .candidateParty {  color:#aaaaaa;  }
             .signPost {  margin:0px auto;  width:10px;  height:40px;  background-color:#B5795A;  box-shadow:-1px 3px 2px #444444 inset;  }
 
-    #signs[scored='true'] {  margin-top:30px;  width:100%;  transform:none;  height:300px;  }
-        #signs[scored='true'] .signCell {  display:block;  position:absolute;  }
-            #signs[scored='true'] .sign {  }
+    #signs[initial='true'] {  margin-top:50px;  width:150%;  transform:scale(0.66) translate(-25%,-25%);  height:auto;  }
+        #signs[initial='true'] .signCell {  display:inline-block;  position:relative;  }
+            #signs[initial='true'] .sign {  }
+                #signs[initial='true'] .signPost {  display:none;  }
 
 
 @media (min-width:825px) {
@@ -87,6 +88,10 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
     #topicSelector {  display:none;  }
     #welcomeMessage {  float:left;  margin:100px 0px 100px 150px;  }
     #question {  margin:150px 10px 10px 200px;  }
+    #signs[initial='true'] {  margin-top:30px;  width:100%;  transform:none;  height:300px;  }
+        #signs[initial='true'] .signCell {  display:block;  position:absolute;  }
+            #signs[initial='true'] .sign {  }
+                #signs[initial='true'] .signPost {  display:block;  }
 }
 
 

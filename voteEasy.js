@@ -5,6 +5,7 @@ var MAX_NARROW_SCREEN = 825;
 
 // state
 var questionIndex = 1;
+var initial = true;
 
 // data
 var questions = null;
@@ -88,6 +89,7 @@ handleMenuButtonClick( ){
 
 function
 handleAnswerScaleClick( event ){
+    initial = false;
     var level = event.target.getAttribute('level');
     level = parseInt(level);
     questionSeries[ questionIndex ].myAnswer = level;
@@ -243,6 +245,8 @@ createElement( tag, id, className, innerHTML ){
 
 function
 updateScores() {
+
+console.log( 'updateScores()' );
     // score = sum( levels-diff )
     //     normalize scores to 0-100%
     //     ignore topics that user did not answer
@@ -274,21 +278,21 @@ updateScores() {
         }
         candidate.score = (scoreLimit == 0)?  0  :  Math.floor(100*(scoreSum / scoreLimit));
     }
-    // update display
-    jQuery('#signs')[0].setAttribute('scored', 'true');
     updateSigns();
 }
 
 function
 updateSigns() {
+    if ( ! initial ){
+        jQuery('#signs')[0].setAttribute('initial', 'false');
+    }
     // update score text
     for ( var c in candidates ){  
         var candidate = candidates[c];
         jQuery('#score'+candidate.index)[0].innerHTML = candidate.score + '% match';
     }
     // resize and move signs
-    var screenWidth = jQuery(window).width();
-    if ( screenWidth < MAX_NARROW_SCREEN ){  updateSignPositionsNarrow();  }
+    if ( jQuery(window).width() <= MAX_NARROW_SCREEN ){  updateSignPositionsNarrow();  }
     else {  updateSignPositionsWide();  }
 }
 
@@ -305,6 +309,7 @@ updateSignPositionsWide( ){
         var candidate = candidates[c];
         candidate.originalWidth = jQuery('#signCell'+candidate.index).width();
         candidate.scale = (candidate.score/200) + 0.50;  // compute sign size based on score alone
+        if ( initial ){  candidate.scale = 1.00;  }
         sumRowWidth += candidate.scale * candidate.originalWidth;
         sumSpaceWidth += 10;
     }
@@ -340,8 +345,20 @@ updateSignPositionsWide( ){
 
 function
 updateSignPositionsNarrow( ){
-    // computes absolute positioning & location
+    // initial layout uses relative positioning
+    if ( initial ){
+        for ( c in candidates ){
+            candidate = candidates[c];
+            var signCell = jQuery('#signCell'+candidate.index)[0];
+            signCell.style.transform = null;
+            signCell.style.zIndex = null;
+            signCell.style.left = null;
+            signCell.style.top = null;
+        }
+        return;
+    }
 
+    // scored layout computes absolute positioning & location
     var candidatesOrdered = orderCandidates();
     // find size reduction to fit at least 3 signs on biggest row
     var screenWidth = jQuery(window).width();
