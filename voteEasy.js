@@ -245,8 +245,6 @@ createElement( tag, id, className, innerHTML ){
 
 function
 updateScores() {
-
-console.log( 'updateScores()' );
     // score = sum( levels-diff )
     //     normalize scores to 0-100%
     //     ignore topics that user did not answer
@@ -404,7 +402,7 @@ updateSignPositionsNarrow( ){
         // when resizing with transform, align to top left corner
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
-        var signCell = jQuery('#signCell'+candidate.index)[0];
+        signCell = jQuery('#signCell'+candidate.index)[0];
         signCell.style.transform = 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%)';
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
