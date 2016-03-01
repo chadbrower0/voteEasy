@@ -171,12 +171,14 @@ initializeSigns() {
         var party = candidate.party;
         var score = candidate.score ?  candidate.score  :  0;
         var sign = createElement('div', 'signCell'+candidate.index, 'signCell', 
-            '<div class="sign" id="sign'+candidate.index+'">' + 
-                '<div class="candidateName">'+candidateName+'</div>' + 
-                '<div class="candidateScore" id="score'+candidate.index+'">' + score + '% match</div>' + 
-                '<img class="candidateImage" src="'+image+'"/>' + 
-                '<div class="candidateParty">'+party+'</div>' + 
-            '</div>' +
+            '<a href="'+candidate.details+'" target=_blank>' +
+                '<div class="sign" id="sign'+candidate.index+'">' +
+                    '<div class="candidateName">'+candidateName+'</div>' +
+                    '<div class="candidateScore" id="score'+candidate.index+'">' + score + '% match</div>' +
+                    '<img class="candidateImage" src="'+image+'"/>' +
+                    '<div class="candidateParty">'+party+'</div>' +
+                '</div>' +
+            '</a>' +
             '<div class="signPost"></div>'
         );
         signs.appendChild( sign );
@@ -190,6 +192,7 @@ setQuestion( questionData ){
 
     // find divs
     var questionTopicDiv = jQuery('#questionTopic')[0];
+    var questionDetailsLink = jQuery('#questionDetails')[0];
     var questionTextDiv = jQuery('#questionText')[0];
     var answerTrue = jQuery('#answerTrue')[0];
     var answerFalse = jQuery('#answerFalse')[0];
@@ -203,6 +206,9 @@ setQuestion( questionData ){
         topicHtml += ' <span id=topicQuestionCount>' + (questionIndexForTopic+1) + ' of ' + questionsForTopic.length + '</span>';
     }
     questionTopicDiv.innerHTML = topicHtml;
+
+    // set details link
+    questionDetailsLink.href = questionData.details;
 
     // set question
     questionTextDiv.innerHTML = questionData.text;

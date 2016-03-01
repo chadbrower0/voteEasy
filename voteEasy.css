@@ -1,4 +1,7 @@
 body {  margin:0px;  padding:0px;  }
+a , a:visited {  color:blue;  text-decoration:none;  }
+a:hover , a:active {  color:blue;  text-decoration:underline;  }
+
 
 #voteEasy {  
     position:relative;  background-color:rgb(150,190,215);  padding:1px;  
@@ -46,6 +49,7 @@ body {  margin:0px;  padding:0px;  }
             #questionTopic {  float:left;  margin:10px 10px 0px 10px;  text-transform:uppercase;  font-weight:bold;  }
                 #topicQuestionCount {  color:#888888;  text-transform:none;  font-weight:normal;  margin-left:10px;  }
             #questionDetails  {  float:right;  margin:15px 10px 0px 0px;  color:#4444aa;  }
+            #questionDetails:hover  {  color:blue;  text-decoration:underline;  }
             .clear {  clear:both;  }
             #questionText {  margin:10px;  font-size:110%;  line-height:150%;  }
         #answer {  display:table-cell;  width:100px;  border-left:solid 1px #dddddd;  vertical-align:top;  text-align:center;  }
@@ -62,9 +66,10 @@ body {  margin:0px;  padding:0px;  }
         .signCell {  display:inline-block;  position:relative;  padding:0px;  margin:2px;  }
             .sign {  
                 position:relative;  background-color:white;  display:inline-block;  border-radius:5px;  border:solid 1px #cccccc;  
-                padding:10px;  text-align:center;
+                padding:10px;  text-align:center;  text-decoration:none;
             }
-                .candidateName {  }
+                .candidateName {  color:black;  }
+                .sign:hover .candidateName {  color:blue;  text-decoration:underline;  }
                 .candidateScore {  color:#888888;  }
                 .candidateImage {  }
                 .candidateParty {  color:#aaaaaa;  }
