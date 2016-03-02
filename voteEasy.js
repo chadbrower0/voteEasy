@@ -46,7 +46,7 @@ retrieveData( ){
 function
 initialize( ){
     // initialize DOM elements
-    initializeQuestions();
+    initializeData();
     initializeTopics();
     initializeSigns();
     // set handlers
@@ -62,7 +62,7 @@ initialize( ){
 }
 
 function
-initializeQuestions( ){
+initializeData( ){
     for ( var t in questions ){
         for ( var q = 0;  q < questions[t].length;  ++q ){
             var question = questions[t][q];
@@ -83,8 +83,8 @@ initializeQuestions( ){
 function
 handleMenuButtonClick( ){
     var voteEasy = jQuery('#voteEasy')[0];
-    var menuActive = ( voteEasy.getAttribute('menuActive') == 'true' )?  'false'  :  'true';
-    voteEasy.setAttribute('menuActive', menuActive);
+    var menuActive = ( voteEasy.getAttribute('menu-active') == 'true' )?  'false'  :  'true';
+    voteEasy.setAttribute('menu-active', menuActive);
 }
 
 function
@@ -190,7 +190,7 @@ initializeSigns() {
 function
 setQuestion( questionData ){
     var voteEasyDiv = jQuery('#voteEasy')[0];
-    if ( questionData == null ){  voteEasyDiv.setAttribute('questionState', 'none');  return;  }
+    if ( questionData == null ){  voteEasyDiv.setAttribute('question-state', 'none');  return;  }
 
     // find divs
     var questionTopicDiv = jQuery('#questionTopic')[0];
@@ -227,7 +227,7 @@ setQuestion( questionData ){
         jQuery('#scaleBox'+questionData.myAnswer)[0].setAttribute('selected', 'true');
     }
 
-    voteEasyDiv.setAttribute('questionState', 'show');
+    voteEasyDiv.setAttribute('question-state', 'show');   // old browsers require lowercase
 }
 
 function
@@ -334,7 +334,7 @@ updateSignPositionsWide( ){
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
         var signCell = jQuery('#signCell'+candidate.index)[0];
-        signCell.style.transform = 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,0%)';
+        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,0%)' );
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
         signCell.style.top = candidate.y + 'px';
@@ -348,7 +348,7 @@ updateSignPositionsNarrow( ){
         for ( c in candidates ){
             candidate = candidates[c];
             var signCell = jQuery('#signCell'+candidate.index)[0];
-            signCell.style.transform = null;
+            setTransform( signCell, null );
             signCell.style.zIndex = null;
             signCell.style.left = null;
             signCell.style.top = null;
@@ -403,7 +403,7 @@ updateSignPositionsNarrow( ){
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
         signCell = jQuery('#signCell'+candidate.index)[0];
-        signCell.style.transform = 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%)';
+        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%)' );
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
         signCell.style.top = candidate.y + 'px';
@@ -420,5 +420,12 @@ orderCandidates( ){
         candidatesOrdered[c].rank = candidatesOrdered.length - c;
     }
     return candidatesOrdered;
+}
+
+function setTransform(element, value){
+    element.style.transform = value;
+    element.style.webkitTransform = value;
+    element.style.MozTransform = value;
+    element.style.msTransform = value;
 }
 
