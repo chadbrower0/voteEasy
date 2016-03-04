@@ -9,15 +9,15 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
     overflow:hidden;
 }
     #menuButton {  display:inline-block;  float:left;  height:25px;  margin:5px;  padding:15px 5px 10px 5px;  background:white;  opacity:0.50;  font-size:150%;  font-weight:bold;  text-transform:uppercase;  border-radius:5px;  cursor:pointer;  }
-    #leftMenu {  display:none;  z-index:100;  height:100%;  background-color:#cccccc;  }
-    #voteEasy[menu-active='true'] #leftMenu {  display:block;  position:fixed;  top:0px;  left:0px;  box-shadow:0px 0px 10px black;  }
+    #leftMenu {  display:none;  z-index:100;  height:100%;  background-color:#cccccc;  position:fixed;  top:0px;  left:0px;  box-shadow:0px 0px 10px black;  }
+    #voteEasy.show-menu #leftMenu {  display:block;  }
         #title , .election {  border-radius:5px;  background-color:rgb(240,240,240);  width:120px;  margin:10px;  padding:10px;  text-align:center;  }
         #title {  text-transform:uppercase;  }
             .firstLetter {  font-size:140%;  }
             .trademark {  vertical-align:super;  font-size:50%;  }
         .election {  text-transform:uppercase;  }
     #contentCover {  display:none;  z-index:99;  position:fixed;  top:0px;  left:0px;  width:100%;  height:100%;  opacity:0.50;  background-color:black;  cursor:pointer;  }
-    #voteEasy[menu-active='true'] #contentCover {  display:block;  }
+    #voteEasy.show-menu #contentCover {  display:block;  }
 
     #topicButtons {  display:none;  float:left;  font-size:70%;  font-weight:bold;  }
         .topicButtonCell {  width:50px;  float:left;  padding:0px;  margin:0px;  }
@@ -32,14 +32,14 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
             .topicOption {  text-transform:capitalize;  }
             .topicOptionPlaceholder {  text-transform:uppercase;  color:grey;  }
 
-    #welcomeMessage {  display:none;  text-align:center;  margin:10px;  color:rgba(0,0,0,0.5);  font-size:200%;  text-shadow:0px 0px 5px white;  }
-    #voteEasy[question-state='none'] #welcomeMessage {  display:block;  }
+    #welcomeMessage {  display:block;  text-align:center;  margin:10px;  color:rgba(0,0,0,0.5);  font-size:200%;  text-shadow:0px 0px 5px white;  }
+    #voteEasy.show-question #welcomeMessage {  display:none;  }
 
     #question {  
-        position:relative;  margin:10px auto 10px auto;  width:calc(100% - 10px);  max-width:600px;  background-color:white;  
-        display:table;  border-radius:5px;  box-shadow:2px 5px 5px grey;  
+        position:relative;  margin:10px auto 10px auto;  width:calc(100% - 10px);  max-width:600px;  background-color:white;
+        display:none;  border-radius:5px;  box-shadow:2px 5px 5px grey;
     }
-    #voteEasy[question-state='none'] #question {  display:none;  }
+    #voteEasy.show-question #question {  display:table;  }
         #prevQuestion {  display:table-cell;  padding-right:5px;  }
             .arrow { 
                 margin:40px 0px 20px -5px;  height:0px;  width:0px;
@@ -55,10 +55,10 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
             #questionText {  margin:10px;  font-size:110%;  line-height:150%;  }
         #answer {  display:table-cell;  width:100px;  border-left:solid 1px #dddddd;  vertical-align:top;  text-align:center;  }
             #answerScale {  display:inline-block;  padding:10px;  margin-right:15px;  }
-                #answerTrue {  display:inline-block;  }
+                #answerTrue {  display:inline-block;  cursor:pointer;  }
                 .scaleBox {  height:10px;  width:20px;  margin:4px auto 4px auto;  border-radius:5px;  background-color:#aaaaaa;  cursor:pointer;  }
-                .scaleBox[selected='true'] {  background-color:#00aa00;  }
-                #answerFalse {  display:inline-block;  }
+                .scaleBox.selected {  background-color:#00aa00;  }
+                #answerFalse {  display:inline-block;  cursor:pointer;  }
             #closeQuestion {  position:absolute;  top:0px;  right:0px;  padding:5px;  font-size:80%;  cursor:pointer;  color:grey;  }
         #nextQuestion {  display:table-cell;  }
             #nextQuestion .arrow {
@@ -66,7 +66,7 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
                 transform:rotate(180deg);  -moz-transform:rotate(180deg);  -ms-transform:rotate(180deg);  -webkit-transform:rotate(180deg);
             }
 
-    #signs {  position:relative;  margin:30px 0px 0px 0px;  text-align:center;  height:300px;  }
+    #signs {  position:relative;  margin:30px 0px 0px 0px;  height:300px;  }
         .signCell {  display:block;  position:absolute;  padding:0px;  margin:2px;  }
             .sign {  
                 position:relative;  background-color:white;  display:inline-block;  border-radius:5px;  border:solid 1px #cccccc;  
@@ -78,30 +78,30 @@ a:hover , a:active {  color:blue;  text-decoration:underline;  }
                 .candidateImage {  }
                 .candidateParty {  color:#aaaaaa;  }
             .signPost {  margin:0px auto;  width:10px;  height:40px;  background-color:#B5795A;  box-shadow:-1px 3px 2px #444444 inset;  }
-
-    #signs[initial='true'] {
-        margin-top:50px;  width:150%;  height:auto;
+    #signs.initial {
+        margin-top:50px;  width:150%;  height:auto;  text-align:center;
         transform:scale(0.66) translate(-25%,-25%);  -moz-transform:scale(0.66) translate(-25%,-25%);  -ms-transform:scale(0.66) translate(-25%,-25%);  -webkit-transform:scale(0.66) translate(-25%,-25%);
     }
-        #signs[initial='true'] .signCell {  display:inline-block;  position:relative;  }
-            #signs[initial='true'] .sign {  }
-                #signs[initial='true'] .signPost {  display:none;  }
+        #signs.initial .signCell {  display:inline-block;  position:relative;  }
+            #signs.initial .sign {  }
+                #signs.initial .signPost {  display:none;  }
 
 
 @media (min-width:825px) {
     #menuButton {  display:none;  }
-    #leftMenu {  display:block;  float:left;  background-color:transparent;  }
+    #leftMenu {  display:block;  position:relative;  float:left;  height:auto;  background-color:transparent;  box-shadow:none;  }
     #topicButtons {  display:block;  }
     #topicSelector {  display:none;  }
     #welcomeMessage {  float:left;  margin:100px 0px 100px 150px;  }
     #question {  margin:150px 10px 10px 200px;  }
-    #signs[initial='true'] {
+    #signs.initial {
         margin-top:30px;  width:100%;  height:300px;
         transform:none;  -moz-transform:none;  -ms-transform:none;  -webkit-transform:none;
     }
-        #signs[initial='true'] .signCell {  display:block;  position:absolute;  }
-            #signs[initial='true'] .sign {  }
-                #signs[initial='true'] .signPost {  display:block;  }
+        #signs.initial .signCell {  display:block;  position:absolute;  }
+            #signs.initial .sign {  }
+                #signs.initial .signPost {  display:block;  }
+
 }
 
 

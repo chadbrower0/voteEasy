@@ -55,6 +55,8 @@ initialize( ){
     jQuery('#topicSelector').on('change', handleTopicSelect);
     jQuery('#closeQuestion').on('click', function(){ setQuestion(null);} );
     jQuery('.scaleBox').on('click', handleAnswerScaleClick);
+    jQuery('#answerTrue').on('click', function(){ handleAnswer(LEVELS-1); } );
+    jQuery('#answerFalse').on('click', function(){ handleAnswer(0); } );
     jQuery('#menuButton').on('click', handleMenuButtonClick);
     jQuery('#contentCover').on('click', handleMenuButtonClick);
     jQuery(window).on('resize', updateScores);
@@ -82,16 +84,18 @@ initializeData( ){
 
 function
 handleMenuButtonClick( ){
-    var voteEasy = jQuery('#voteEasy')[0];
-    var menuActive = ( voteEasy.getAttribute('menu-active') == 'true' )?  'false'  :  'true';
-    voteEasy.setAttribute('menu-active', menuActive);
+    jQuery('#voteEasy').toggleClass('show-menu');    // change class because old browsers do not update css for attribute change
 }
 
 function
 handleAnswerScaleClick( event ){
-    initial = false;
     var level = event.target.getAttribute('level');
     level = parseInt(level);
+    handleAnswer( level );
+}
+function
+handleAnswer( level ){
+    initial = false;
     questionSeries[ questionIndex ].myAnswer = level;
     // update answer display
     var question = questionSeries[ questionIndex ];
@@ -189,8 +193,11 @@ initializeSigns() {
 
 function
 setQuestion( questionData ){
-    var voteEasyDiv = jQuery('#voteEasy')[0];
-    if ( questionData == null ){  voteEasyDiv.setAttribute('question-state', 'none');  return;  }
+    // if no question ... hide question
+    if ( questionData == null ){
+        jQuery('#voteEasy').removeClass('show-question');
+        return;
+    }
 
     // find divs
     var questionTopicDiv = jQuery('#questionTopic')[0];
@@ -221,13 +228,12 @@ setQuestion( questionData ){
 
     // show user answer
     for ( var l = 0;  l < 5;  ++l ){
-        jQuery('#scaleBox'+l)[0].setAttribute('selected', 'false');
+        jQuery('#scaleBox'+l).removeClass('selected');
     }
     if ( questionData.myAnswer !== null  &&  questionData.myAnswer !== undefined ){
-        jQuery('#scaleBox'+questionData.myAnswer)[0].setAttribute('selected', 'true');
+        jQuery('#scaleBox'+questionData.myAnswer).addClass('selected');
     }
-
-    voteEasyDiv.setAttribute('question-state', 'show');   // old browsers require lowercase
+    jQuery('#voteEasy').addClass('show-question');
 }
 
 function
@@ -282,7 +288,7 @@ updateScores() {
 function
 updateSigns() {
     if ( ! initial ){
-        jQuery('#signs')[0].setAttribute('initial', 'false');
+        jQuery('#signs').removeClass('initial');
     }
     // update score text
     for ( var c in candidates ){  
@@ -334,7 +340,7 @@ updateSignPositionsWide( ){
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
         var signCell = jQuery('#signCell'+candidate.index)[0];
-        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,0%)' );
+        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,0%) translateZ(0)' );  // use translateZ(0) to force re-render for older webkit browsers
         signCell.style.zIndex = candidate.rank;
         signCell.style.left = candidate.x + 'px';
         signCell.style.top = candidate.y + 'px';
@@ -358,6 +364,7 @@ updateSignPositionsNarrow( ){
 
     // scored layout computes absolute positioning & location
     var candidatesOrdered = orderCandidates();
+
     // find size reduction to fit at least 3 signs on biggest row
     var screenWidth = jQuery(window).width();
     var sumLargestRowWidth = 0;
@@ -403,10 +410,10 @@ updateSignPositionsNarrow( ){
         // left = 0.5orig - scale/2  =  0.5/scale - 1.00/2  =  0.5/scale - 0.50
         var translate = -100 * ((0.5/candidate.scale) - 0.5);
         signCell = jQuery('#signCell'+candidate.index)[0];
-        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%)' );
+        setTransform( signCell, 'scale('+candidate.scale+','+candidate.scale+') translate('+translate+'%,'+translate+'%) translateZ(0)' );  // use translateZ(0) to force re-render for older webkit browsers
         signCell.style.zIndex = candidate.rank;
-        signCell.style.left = candidate.x + 'px';
-        signCell.style.top = candidate.y + 'px';
+        signCell.style.left = parseInt(candidate.x) + 'px';
+        signCell.style.top = parseInt(candidate.y) + 'px';
     }
 }
 
